@@ -53,6 +53,40 @@ A/C:
 - Number.MAX_SAFE_INTEGER(9,007,199,254,740,991) is the max allowed input, a tooltip on the display area should contain a warning about this.
 - the UX is responsive growing horizontally but kept centered when space is available and being able to be reduced to a mobile friendly format.
 
+**Status: done.** Implementation notes:
+- Implemented under `sezzle-ta-calculator-fe/src/components/calculator/`
+  (calculator-shell, display-main, display-expression, input-button,
+  action-button, keypad) plus `src/lib/number-input.ts` (digit/format
+  validation) and `src/types/calculator.ts` (the `Operation`/`ActionKind`
+  vocabulary, kept identical to CONTRACT.md's operation strings — add,
+  subtract, multiply, divide, power, sqrt — for Story 1.4 forward-compatibility).
+- calculator-shell owns only local `displayValue`, `expression` (always
+  blank in this story), `isError`, and a cosmetic `activeOperation`
+  highlight — no `left`/`operation`/`right`/`isTemporal` state machine and
+  no network calls; that machine and the POST /api/v1/calculate wiring are
+  Story 1.4's responsibility.
+- Operation and equals action-buttons are visually wired (hover, click,
+  pressed/selected styling) but perform no calculation in this story, by
+  design.
+- The only trigger for the temporary "ERR" display in this story is a
+  client-side Number.MAX_SAFE_INTEGER overflow guard during digit entry
+  (no BE-driven error states exist yet); it auto-reverts to the last valid
+  value after a short timeout, and is fully cleared by AC/C.
+- Design approach: reused the app's existing OKLCH/shadcn tokens rather
+  than introducing a new palette — the shell reads as a physical
+  instrument (an inset "LCD" display panel, tabular numerals that don't
+  jitter while typing) rather than a generic card-grid layout, with a
+  single bold accent reserved for the equals key.
+- Added shadcn `tooltip` (`npx shadcn@latest add tooltip`) for the
+  MAX_SAFE_INTEGER warning on display-main; all other calculator UI is
+  composed from the existing `Button` primitive — no other new shadcn
+  components were needed.
+- Verified via `npm run lint`, `npm run build`, and a manual browser check
+  (hover states, click + keyboard entry, leading-zero stripping, overflow
+  ERR + auto-revert, responsive breakpoints down to ~390px, tooltip). No
+  automated test framework was added, per agents.md guidance to add one
+  only when the first CONTRACT.md-driven test is written (Story 1.4).
+
 ### Story 1.3: create a docker compose file to connect both modules
 
 As an engineer I need FE/BE to be able to communicate.
