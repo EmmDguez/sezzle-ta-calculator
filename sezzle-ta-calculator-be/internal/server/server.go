@@ -16,7 +16,11 @@ func NewRouter() *chi.Mux {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Get("/healthz", handler.Health)
+	r.Get("/livez", handler.Livez)
+	r.Get("/readyz", handler.Readyz)
+	r.Get("/health", handler.Health)
+
+	r.Post("/api/v1/calculate", handler.Calculate)
 
 	return r
 }

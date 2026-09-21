@@ -14,6 +14,6 @@ FROM gcr.io/distroless/static-debian12:latest AS runtime
 COPY --from=build /out/sezzle-ta-calculator-be /sezzle-ta-calculator-be
 
 USER nonroot:nonroot
-EXPOSE 8080
+EXPOSE 8090
 
 ENTRYPOINT ["/sezzle-ta-calculator-be"]

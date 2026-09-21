@@ -27,3 +27,18 @@ A folder called "sezzle-ta-calculator-fe"
 Include a README.md file for each module, with required tools, versions, and instructions to run the project, validate the services are running dont commit anything yet.
 ---
 I have updated the FE port to be 4080 and the BE to be 8090, added a contacts.md and epics.md file, validate the changes and check readme.md files are still ok, commit as initial commit.
+---
+/bmad-method:bmad-sprint-planning
+---
+planning-mode -> /bmad-method:bmad-build story 1.1
+---
+unify 8090 as the sole port when running through docker and locally so that all examples in readme pass for both scenarios and add validation so that sqrt returns unsupported operation whenre the value of right is present as we only use left, remember to update first contract
+---
+/code-review
+
+follow-up: yes, fix the priority bugs and include the scenarios to keep testing them on contracts.md
+---
+"    "substract": Subtract, // NB: "substract" is CONTRACT.md's spelling, not a typo to fix. " is a valid typo, fix it in contract and then on code, also check for other typos of subtract
+---
+/bmad-build story 1.2 use contents of planning folder any new files needed to track desicions/stories should be created on the same
+  folder/added as modifications to epics.md (keep all changes in fe module, respect contract.md though this should be a design only issue)
