@@ -77,7 +77,7 @@ export function Keypad({ activeOperation, onDigit, onAction }: KeypadProps) {
       <InputButton digit="5" onPress={onDigit} />
       <InputButton digit="6" onPress={onDigit} />
       <OperationSlot
-        operation="subtract"
+        operation="substract"
         activeOperation={activeOperation}
         onAction={onAction}
       />

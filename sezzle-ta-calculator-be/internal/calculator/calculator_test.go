@@ -8,7 +8,7 @@ import (
 )
 
 // TestCalculate covers every calculator-level scenario in CONTRACT.md's
-// test scenario table (the "subtract | | | 400 missing_field" row is
+// test scenario table (the "substract | | | 400 missing_field" row is
 // HTTP/validation-level only and belongs to the handler tests instead,
 // since calculator.Subtract only accepts float64 and can't represent
 // "missing").
@@ -22,7 +22,7 @@ func TestCalculate(t *testing.T) {
 	}{
 		{name: "add", op: "add", left: 2, right: 3, wantResult: 5},
 		{name: "add_overflow", op: "add", left: 9007199254740991, right: 1, wantErrCode: "overflow"},
-		{name: "subtract", op: "subtract", left: 300, right: 100, wantResult: 200},
+		{name: "substract", op: "substract", left: 300, right: 100, wantResult: 200},
 		{name: "multiply", op: "multiply", left: 100, right: 200, wantResult: 20000},
 		{name: "multiply_negative", op: "multiply", left: -100, right: 200, wantResult: -20000},
 		{name: "multiply_overflow", op: "multiply", left: 9007199254740991, right: 2, wantErrCode: "overflow"},
@@ -36,7 +36,7 @@ func TestCalculate(t *testing.T) {
 
 		// Decimal scenarios added to CONTRACT.md by this story.
 		{name: "decimal_add", op: "add", left: 2.5, right: 3.25, wantResult: 5.75},
-		{name: "decimal_subtract", op: "subtract", left: 10.75, right: 4.5, wantResult: 6.25},
+		{name: "decimal_substract", op: "substract", left: 10.75, right: 4.5, wantResult: 6.25},
 		{name: "decimal_multiply_precision", op: "multiply", left: 0.1, right: 0.2, wantResult: 0.02},
 		{name: "decimal_divide_rounding", op: "divide", left: 1, right: 3, wantResult: 0.3333},
 		{name: "decimal_power", op: "power", left: 2, right: 0.5, wantResult: 1.4142},
@@ -100,7 +100,7 @@ func TestOverflowPrecedence(t *testing.T) {
 }
 
 func TestSupported(t *testing.T) {
-	for _, op := range []string{"add", "subtract", "multiply", "divide", "power", "sqrt"} {
+	for _, op := range []string{"add", "substract", "multiply", "divide", "power", "sqrt"} {
 		if !calculator.Supported(op) {
 			t.Errorf("Supported(%q) = false, want true", op)
 		}

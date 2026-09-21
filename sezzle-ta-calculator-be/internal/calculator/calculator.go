@@ -144,12 +144,12 @@ func Sqrt(left, _ float64) (float64, error) {
 type operationFunc func(left, right float64) (float64, error)
 
 var operations = map[string]operationFunc{
-	"add":      Add,
-	"subtract": Subtract,
-	"multiply": Multiply,
-	"divide":   Divide,
-	"power":    Power,
-	"sqrt":     Sqrt,
+	"add":       Add,
+	"substract": Subtract,
+	"multiply":  Multiply,
+	"divide":    Divide,
+	"power":     Power,
+	"sqrt":      Sqrt,
 }
 
 // Supported reports whether operation is one of the operations this package

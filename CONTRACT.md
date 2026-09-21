@@ -26,7 +26,7 @@ Stories are defined on the Planning folder.
 
 #### Request
 Formatted as JSON, with the fields:
-- operation(string, required) - [add, subtract, multiply, divide, power, sqrt]
+- operation(string, required) - [add, substract, multiply, divide, power, sqrt]
 - left(number, required) - number 
 - right(number, conditional) - number; required for every operation except sqrt. For sqrt, right must be omitted entirely — including it is rejected as `unsupported_operation`.
 Sample:
@@ -77,8 +77,8 @@ Simple check for backwards compatibility.
 operation | left | right | result\error
 add | 2 | 3 | 5
 add | 9007199254740991 | 1 | 422 overflow
-subtract | 300 | 100 | 200
-subtract | | | 400 missing_field
+substract | 300 | 100 | 200
+substract | | | 400 missing_field
 multiply | 100 | 200 | 20000 
 multiply | -100 | 200 | -20000 
 multiply | 9007199254740991 | 2| 422 overflow
@@ -90,7 +90,7 @@ percentage | 10 | 10 | 400 unsupported_operation
 power | 2 | 54 | 422 overflow
 power | 5 | 4 | 625
 add | 2.5 | 3.25 | 5.75
-subtract | 10.75 | 4.5 | 6.25
+substract | 10.75 | 4.5 | 6.25
 multiply | 0.1 | 0.2 | 0.02
 divide | 1 | 3 | 0.3333
 power | 2 | 0.5 | 1.4142
