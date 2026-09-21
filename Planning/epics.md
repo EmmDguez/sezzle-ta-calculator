@@ -131,6 +131,65 @@ API will live  on 8090 port and UI on 4080 port.
   (`localhost:4080` → `localhost:8090`), CORS headers will be needed on the
   BE for browser fetches to succeed.
 
+### Story 1.3.1: BE: Enable CORS for the FE origin
+
+As an engineer I need the BE to accept cross-origin requests from the FE
+so Story 1.4 can call `POST /api/v1/calculate` (and the health endpoints)
+directly from the browser without a reverse proxy.
+
+Context: flagged as a follow-up under Story 1.3 above — the FE and BE run
+on different origins (`http://localhost:4080` vs `http://localhost:8090`
+locally, and the same ports via docker-compose), and the BE currently has
+no CORS middleware (grepped in Story 1.3, zero matches).
+
+A/C:
+- `CONTRACT.md` is updated first (contract-first rule) to document the
+  CORS requirement — allowed origin(s), methods, headers — before
+  implementing it in the BE.
+- The BE sends CORS headers (`Access-Control-Allow-Origin` and preflight
+  `OPTIONS` handling for `Content-Type`, `POST`) on `/api/v1/calculate`,
+  and on `/livez`, `/readyz`, `/health`.
+- The allowed origin covers `http://localhost:4080` (both local
+  `npm run dev`/`preview` and the docker-compose `ui` service, which per
+  Story 1.3 both consistently use port 4080).
+- `go test ./...` covers the new middleware (e.g. an `internal/server`
+  test asserting the header is present and `OPTIONS` preflight succeeds).
+- Must be completed before Story 1.4, which assumes the FE can call the BE
+  directly, cross-origin, without any additional plumbing (no reverse
+  proxy is planned in Story 1.4).
+
+**Status: done.** Implementation notes:
+- `CONTRACT.md` gained a new "2.1 CORS" section (added first, per the
+  contract-first rule) documenting the allowed origin
+  (`http://localhost:4080`, overridable via `CORS_ALLOWED_ORIGIN`), allowed
+  methods (`GET`, `POST`, `OPTIONS`), allowed header (`Content-Type`), and
+  that preflight `OPTIONS` requests are answered directly.
+- Added the [go-chi/cors](https://github.com/go-chi/cors) middleware
+  (`internal/server/server.go`), wired globally via `r.Use(cors.Handler(...))`
+  so it covers every route (`/api/v1/calculate`, `/livez`, `/readyz`,
+  `/health`) with one declaration rather than repeating it per-route. The
+  allowed origin reads from `CORS_ALLOWED_ORIGIN`, defaulting to
+  `http://localhost:4080` (the FE's port everywhere per Story 1.3) — same
+  env-var-with-default pattern already used for `PORT` in `main.go`.
+  `docker-compose.yml`'s `api` service now sets `CORS_ALLOWED_ORIGIN`
+  explicitly too, for the same reason `PORT` is set explicitly there even
+  though it matches the default.
+- `internal/server/server_test.go` gained `TestCORS`: asserts
+  `Access-Control-Allow-Origin` is present on a normal request to all four
+  routes, that an `OPTIONS` preflight (with `Access-Control-Request-Method`/
+  `-Headers`) gets a 2xx with the right headers, and that a disallowed
+  origin gets no CORS header at all (browsers enforce CORS client-side, so
+  the BE deliberately doesn't need to reject the request itself — omitting
+  the header is sufficient).
+- Verified against the real Docker image, not just the Go test suite:
+  rebuilt and ran the `api` service via `docker compose up -d --build api`,
+  then `curl`'d it directly with an `Origin: http://localhost:4080` header
+  (both a plain `GET /livez` and an `OPTIONS` preflight against
+  `/api/v1/calculate`) and confirmed the headers match CONTRACT.md, and that
+  `Origin: http://evil.example.com` gets no `Access-Control-Allow-Origin`
+  header back.
+- `go build ./...`, `go vet ./...`, and `go test ./...` all pass cleanly.
+
 ### Story 1.4: FE: State wiring to the real API.
 As a user I required the actions in the calculator to generate results that are correct and valid.
 
@@ -157,3 +216,35 @@ A/C:
   - the test scenarios behave as expected.
   - the readme.md on the module directory is updated with usage instructions.
   - If the backend returns an unexpected connection issue, UNAVAILABLE should be set on the display.
+
+**Planning notes (not yet implemented — depends on Story 1.3.1 above):**
+- Two ambiguities in this story's own wording were resolved before
+  implementation planning: (1) "the values sent to the BE are visible
+  there (right + operation + left)" is implemented as conventional
+  `left operation right` order (e.g. `10 + 5`), treating the literal order
+  as a wording slip; (2) sqrt "only requires a right value" is implemented
+  as always short-circuiting — clicking √ computes on whatever is
+  currently in display-main and discards/cancels any pending
+  left/operation, regardless of whether a binary operation was in
+  progress.
+- Despite this story calling sqrt's operand a "right" value (by analogy
+  with the binary-op state naming), the actual wire payload sent to the BE
+  for sqrt uses CONTRACT.md's `left` field with `right` omitted entirely —
+  the internal state-naming convention here and CONTRACT's wire field name
+  intentionally don't match, and CONTRACT wins for anything on the network.
+- Errors are modelled as a `status: "ok" | "error" | "unavailable"` tri-state
+  (replacing Story 1.2's boolean `isError`): a BE-rejected calculation
+  (parseable `{error, message}` body) shows `"ERR"` and persists until
+  AC/C/new digit entry (no auto-revert, unlike the local overflow guard);
+  a network/parse failure shows `"UNAVAILABLE"` per this story's explicit A/C.
+- Requires Story 1.3.1 (BE CORS) to be done first — the FE calls the BE's
+  absolute origin directly (`http://<host>:8090`, resolved from
+  `window.location.hostname` with an env override), no reverse proxy is
+  planned in either `vite.config.ts` or `nginx.conf`.
+- Planned state fields on `calculator-shell`: `displayValue`, `expression`,
+  `left`, `operation`, `isTemporal`, `status`, and a minimal `isLoading`
+  guard (disables the keypad and ignores stale responses while a
+  `POST /api/v1/calculate` call is in flight, to prevent double-submits).
+  A new `src/lib/calculator-api.ts` wraps the fetch call and maps
+  responses to `{ok:true, result}` / `{ok:false, kind:"rejected", error,
+  message}` / `{ok:false, kind:"unavailable"}`.

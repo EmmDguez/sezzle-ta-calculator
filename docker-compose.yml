@@ -5,6 +5,7 @@ services:
       - "8090:8090"
     environment:
       - PORT=8090
+      - CORS_ALLOWED_ORIGIN=http://localhost:4080
 
   ui:
     build: ./sezzle-ta-calculator-fe

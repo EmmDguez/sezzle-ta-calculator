@@ -39,6 +39,8 @@ personal preference. `gofmt`/`go vet` must be clean before committing.
     the HTTP server (`PORT` env var, defaults to `8090` — the same port used
     in the Docker image, so local and containerized runs agree)
   - `internal/server` — chi router construction and route registration
+    (also wires `go-chi/cors`; allowed origin comes from `CORS_ALLOWED_ORIGIN`,
+    defaulting to `http://localhost:4080` per CONTRACT.md's CORS section)
   - `internal/handler` — HTTP handlers
   - `internal/validate` — shared `go-playground/validator` instance for
     validating request payloads (`validate.Struct`)
@@ -48,6 +50,8 @@ personal preference. `gofmt`/`go vet` must be clean before committing.
 - [chi](https://github.com/go-chi/chi) for routing and middleware
   (`middleware.RequestID`, `middleware.Logger`, `middleware.Recoverer` are
   wired in `internal/server`)
+- [go-chi/cors](https://github.com/go-chi/cors) for the FE's cross-origin
+  requests (see `internal/server` above)
 
 ## Commands
 

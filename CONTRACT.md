@@ -72,6 +72,22 @@ Simple check for backwards compatibility.
 { "status": "ok" }
 ```
 
+## 2.1 CORS
+
+The FE and BE run on different origins (`http://localhost:4080` vs
+`http://localhost:8090`, both locally and via docker-compose per Story 1.3),
+so the BE must send CORS headers on every endpoint the FE calls directly
+from the browser: `POST /api/v1/calculate`, `GET /livez`, `GET /readyz`, and
+`GET /health`.
+
+- Allowed origin: `http://localhost:4080` (configurable via the BE's
+  `CORS_ALLOWED_ORIGIN` environment variable for other deployments).
+- Allowed methods: `GET`, `POST`, `OPTIONS`.
+- Allowed headers: `Content-Type`.
+- Preflight `OPTIONS` requests are answered directly (no route handler
+  logic runs) with the same CORS headers and a 2xx status, per the
+  standard browser CORS preflight flow.
+
 
 ## 3. Test scenarios
 operation | left | right | result\error

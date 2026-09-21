@@ -38,7 +38,8 @@ Each module also runs on its own, without Docker, for local development. See:
   * Keeping on file but would serve for tracking against a real ticketing.system like jira.
   * Ommitted percentage as it adds a layer of complexity over the operands, it would be a next story under this repo.
 * Defined the requirements as stories in the epics.md file.
-* Using Long Term Support versions for the services
+* Using Long Term Support versions for the services.
   * FE, is using node 24,tailwimd and shadcn/ui as supporting tools.
-  * GO, is using chi and validator 
-* 
+  * GO, is using chi, go-chi/cors, and validator. 
+* Using max typescript int as self imposed calculator limit.
+* Using 4 digits as self imposed decimal rounding in results.

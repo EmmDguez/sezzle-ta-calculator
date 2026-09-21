@@ -1,9 +1,10 @@
 # sezzle-ta-calculator-be
 
 Backend for the Sezzle TA calculator: a Go HTTP API built with
-[chi](https://github.com/go-chi/chi) for routing and
-[go-playground/validator](https://github.com/go-playground/validator) for
-request validation.
+[chi](https://github.com/go-chi/chi) for routing and middleware (including
+[go-chi/cors](https://github.com/go-chi/cors) for the FE's cross-origin
+requests) and [go-playground/validator](https://github.com/go-playground/validator)
+for request validation.
 
 See [`agents.md`](./agents.md) for coding conventions, project layout, and
 the style guide, and the [root `agents.md`](../agents.md) /
@@ -28,6 +29,14 @@ used when running via Docker below). Set `PORT` to change it:
 
 ```bash
 PORT=9090 go run ./cmd/sezzle-ta-calculator-be
+```
+
+CORS is enabled for the FE's origin, `http://localhost:4080` by default
+(matching the FE's dev/preview/Docker port — see CONTRACT.md's CORS
+section). Set `CORS_ALLOWED_ORIGIN` to change it:
+
+```bash
+CORS_ALLOWED_ORIGIN=http://localhost:5173 go run ./cmd/sezzle-ta-calculator-be
 ```
 
 ### Validate it's running

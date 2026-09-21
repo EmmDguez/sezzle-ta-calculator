@@ -40,5 +40,23 @@ follow-up: yes, fix the priority bugs and include the scenarios to keep testing 
 ---
 "    "substract": Subtract, // NB: "substract" is CONTRACT.md's spelling, not a typo to fix. " is a valid typo, fix it in contract and then on code, also check for other typos of subtract
 ---
+ I've manually tested , commit changes and mark story done
+---
 /bmad-build story 1.2 use contents of planning folder any new files needed to track desicions/stories should be created on the same
   folder/added as modifications to epics.md (keep all changes in fe module, respect contract.md though this should be a design only issue)
+---
+I have reviewed, commit.
+---
+/compact
+---
+/bmad-build story 1.3 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md, keep ports consistent for the FE as we did for BE.
+---
+/bmad-method:bmad-build story 1.4 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md, this is planning assume 1.3 will be done before implementing.
+
+follow up: required new story for cors
+---
+Was wrong to request the change from subtract to substract, apply the correct spelling everywhere starting by contract.md
+---
+/compact
+---
+/bmad-build  story 1.3.1 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.mdee
