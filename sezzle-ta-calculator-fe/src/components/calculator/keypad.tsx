@@ -4,7 +4,8 @@ import { ActionButton } from "./action-button";
 import { OPERATION_BUTTON } from "./button-config";
 
 interface KeypadProps {
-  activeOperation: Operation | null;
+  operation: Operation | null;
+  disabled?: boolean;
   onDigit: (digit: string) => void;
   onAction: (kind: ActionKind) => void;
 }
@@ -12,6 +13,7 @@ interface KeypadProps {
 interface OperationSlotProps {
   operation: Operation;
   activeOperation: Operation | null;
+  disabled?: boolean;
   onAction: (kind: ActionKind) => void;
   className?: string;
 }
@@ -19,6 +21,7 @@ interface OperationSlotProps {
 function OperationSlot({
   operation,
   activeOperation,
+  disabled,
   onAction,
   className,
 }: OperationSlotProps) {
@@ -29,6 +32,7 @@ function OperationSlot({
       label={label}
       ariaLabel={ariaLabel}
       active={activeOperation === operation}
+      disabled={disabled}
       onPress={onAction}
       className={className}
     />
@@ -36,13 +40,19 @@ function OperationSlot({
 }
 
 /** 4-column grid: clear row, then operations down the right column, digits filling the rest. */
-export function Keypad({ activeOperation, onDigit, onAction }: KeypadProps) {
+export function Keypad({
+  operation,
+  disabled = false,
+  onDigit,
+  onAction,
+}: KeypadProps) {
   return (
     <div className="grid grid-cols-4 gap-2 sm:gap-3">
       <ActionButton
         kind="all-clear"
         label="AC"
         ariaLabel="All clear"
+        disabled={disabled}
         onPress={onAction}
         className="text-base"
       />
@@ -50,59 +60,67 @@ export function Keypad({ activeOperation, onDigit, onAction }: KeypadProps) {
         kind="clear"
         label="C"
         ariaLabel="Clear"
+        disabled={disabled}
         onPress={onAction}
         className="text-base"
       />
       <OperationSlot
         operation="sqrt"
-        activeOperation={activeOperation}
+        activeOperation={operation}
+        disabled={disabled}
         onAction={onAction}
       />
       <OperationSlot
         operation="divide"
-        activeOperation={activeOperation}
+        activeOperation={operation}
+        disabled={disabled}
         onAction={onAction}
       />
 
-      <InputButton digit="7" onPress={onDigit} />
-      <InputButton digit="8" onPress={onDigit} />
-      <InputButton digit="9" onPress={onDigit} />
+      <InputButton digit="7" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="8" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="9" onPress={onDigit} disabled={disabled} />
       <OperationSlot
         operation="multiply"
-        activeOperation={activeOperation}
+        activeOperation={operation}
+        disabled={disabled}
         onAction={onAction}
       />
 
-      <InputButton digit="4" onPress={onDigit} />
-      <InputButton digit="5" onPress={onDigit} />
-      <InputButton digit="6" onPress={onDigit} />
+      <InputButton digit="4" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="5" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="6" onPress={onDigit} disabled={disabled} />
       <OperationSlot
         operation="subtract"
-        activeOperation={activeOperation}
+        activeOperation={operation}
+        disabled={disabled}
         onAction={onAction}
       />
 
-      <InputButton digit="1" onPress={onDigit} />
-      <InputButton digit="2" onPress={onDigit} />
-      <InputButton digit="3" onPress={onDigit} />
+      <InputButton digit="1" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="2" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="3" onPress={onDigit} disabled={disabled} />
       <OperationSlot
         operation="add"
-        activeOperation={activeOperation}
+        activeOperation={operation}
+        disabled={disabled}
         onAction={onAction}
       />
 
       <OperationSlot
         operation="power"
-        activeOperation={activeOperation}
+        activeOperation={operation}
+        disabled={disabled}
         onAction={onAction}
         className="text-base"
       />
-      <InputButton digit="0" onPress={onDigit} />
-      <InputButton digit="." onPress={onDigit} />
+      <InputButton digit="0" onPress={onDigit} disabled={disabled} />
+      <InputButton digit="." onPress={onDigit} disabled={disabled} />
       <ActionButton
         kind="equals"
         label="="
         ariaLabel="Equals"
+        disabled={disabled}
         onPress={onAction}
       />
     </div>

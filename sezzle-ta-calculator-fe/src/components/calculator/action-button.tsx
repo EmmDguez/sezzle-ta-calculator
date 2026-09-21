@@ -27,16 +27,18 @@ interface ActionButtonProps {
   label: string;
   ariaLabel: string;
   active?: boolean;
+  disabled?: boolean;
   onPress: (kind: ActionKind) => void;
   className?: string;
 }
 
-/** AC / C / operation / equals key — visually wired per Story 1.2, no calculation behind it yet. */
+/** AC / C / operation / equals key — wired to calculator-shell's state machine. */
 export function ActionButton({
   kind,
   label,
   ariaLabel,
   active = false,
+  disabled = false,
   onPress,
   className,
 }: ActionButtonProps) {
@@ -45,6 +47,7 @@ export function ActionButton({
       type="button"
       variant={variantForKind(kind)}
       aria-pressed={active}
+      disabled={disabled}
       className={cn(
         "aspect-square w-full text-xl font-normal",
         active && "ring-3 ring-ring/50",

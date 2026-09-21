@@ -34,6 +34,31 @@ curl -sf http://localhost:4080/ > /dev/null && echo "FE dev server OK"
 
 Or just open http://localhost:4080 in a browser and confirm the page loads.
 
+## Using the calculator
+
+The app calls the backend's `POST /api/v1/calculate` directly from the
+browser (see [`../CONTRACT.md`](../CONTRACT.md)), so **the BE must also be
+running** — either `go run ./cmd/sezzle-ta-calculator-be` in
+`sezzle-ta-calculator-be/` (port 8090), or `docker compose up` from the
+repo root, which starts both.
+
+- Type digits with the numpad or your keyboard (`0`-`9`, `.`); `Backspace`
+  clears the current entry (`C`), `Escape` clears everything (`AC`).
+- Pick an operation (`+ − × ÷ x^y √`) and, for every operation except `√`,
+  type a second number, then press `=` (or `Enter`) to send it to the BE.
+  `√` is unary and computes as soon as it's clicked/pressed on whatever
+  number is currently shown.
+- You can chain operations without pressing `=` in between — e.g.
+  `5 + 3 +` immediately computes `5 + 3` and starts the next operation
+  from `8`.
+- A rejected calculation (e.g. dividing by zero) shows `ERR`; if the BE
+  can't be reached at all, the display shows `UNAVAILABLE`. Either clears
+  on `AC`, `C`, or typing a new number.
+- By default the app targets the BE on the page's own host, port 8090
+  (`http://<host>:8090`) — matching both local dev and the docker-compose
+  setup. Override it for other deployments with a `VITE_API_BASE_URL`
+  build-time env var (e.g. `VITE_API_BASE_URL=https://api.example.com`).
+
 ## Other commands
 
 ```bash

@@ -30,6 +30,15 @@ function exceedsMaxSafeInteger(candidate: string): boolean {
  * unchanged with `overflowed: true` when the keystroke would exceed it.
  */
 export function appendDigit(current: string, char: string): DigitInputResult {
+  if (char === "-") {
+    // Only meaningful when nothing's been typed yet for this operand —
+    // calculator-shell only ever calls this with "-" in that case,
+    // dispatching to the subtract action otherwise.
+    return current === ""
+      ? { value: "-", overflowed: false }
+      : { value: current, overflowed: false };
+  }
+
   if (char === ".") {
     if (current.includes(".")) {
       return { value: current, overflowed: false };
@@ -43,4 +52,9 @@ export function appendDigit(current: string, char: string): DigitInputResult {
     return { value: current, overflowed: true };
   }
   return { value: candidate, overflowed: false };
+}
+
+/** True for a display value with no usable number yet ("" or a lone "-"). */
+export function isBlankOperand(value: string): boolean {
+  return value === "" || value === "-";
 }

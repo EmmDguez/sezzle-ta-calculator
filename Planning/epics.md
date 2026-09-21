@@ -217,34 +217,117 @@ A/C:
   - the readme.md on the module directory is updated with usage instructions.
   - If the backend returns an unexpected connection issue, UNAVAILABLE should be set on the display.
 
-**Planning notes (not yet implemented — depends on Story 1.3.1 above):**
-- Two ambiguities in this story's own wording were resolved before
-  implementation planning: (1) "the values sent to the BE are visible
-  there (right + operation + left)" is implemented as conventional
+**Status: done.** Implementation notes:
+- Two ambiguities in this story's own wording were resolved with the user
+  before implementation: (1) "the values sent to the BE are visible there
+  (right + operation + left)" is implemented as conventional
   `left operation right` order (e.g. `10 + 5`), treating the literal order
   as a wording slip; (2) sqrt "only requires a right value" is implemented
   as always short-circuiting — clicking √ computes on whatever is
   currently in display-main and discards/cancels any pending
   left/operation, regardless of whether a binary operation was in
-  progress.
+  progress (confirmed live: `16 + 4` then `√` shows `2`, and a further
+  `+ 3 =` correctly starts from `2`, not from the abandoned `16`).
 - Despite this story calling sqrt's operand a "right" value (by analogy
   with the binary-op state naming), the actual wire payload sent to the BE
   for sqrt uses CONTRACT.md's `left` field with `right` omitted entirely —
   the internal state-naming convention here and CONTRACT's wire field name
   intentionally don't match, and CONTRACT wins for anything on the network.
-- Errors are modelled as a `status: "ok" | "error" | "unavailable"` tri-state
-  (replacing Story 1.2's boolean `isError`): a BE-rejected calculation
-  (parseable `{error, message}` body) shows `"ERR"` and persists until
-  AC/C/new digit entry (no auto-revert, unlike the local overflow guard);
-  a network/parse failure shows `"UNAVAILABLE"` per this story's explicit A/C.
-- Requires Story 1.3.1 (BE CORS) to be done first — the FE calls the BE's
-  absolute origin directly (`http://<host>:8090`, resolved from
-  `window.location.hostname` with an env override), no reverse proxy is
-  planned in either `vite.config.ts` or `nginx.conf`.
-- Planned state fields on `calculator-shell`: `displayValue`, `expression`,
-  `left`, `operation`, `isTemporal`, `status`, and a minimal `isLoading`
-  guard (disables the keypad and ignores stale responses while a
-  `POST /api/v1/calculate` call is in flight, to prevent double-submits).
-  A new `src/lib/calculator-api.ts` wraps the fetch call and maps
-  responses to `{ok:true, result}` / `{ok:false, kind:"rejected", error,
-  message}` / `{ok:false, kind:"unavailable"}`.
+- `calculator-shell.tsx` state: `displayValue` (the in-progress operand —
+  left or right, per the story text, is whichever CONTRACT.md field it
+  becomes once committed), `expression`, `left`, `operation`, `isTemporal`,
+  a `status: "ok" | "error" | "unavailable"` tri-state (replacing Story
+  1.2's boolean `isError`), and a minimal `isLoading` guard that disables
+  the keypad and ignores stale responses while a request is in flight (a
+  `requestSeqRef` counter bumped on every new call and on `AC`, so a late
+  response after a reset is discarded rather than resurrecting old state).
+- A BE-rejected calculation (parseable `{error, message}` body) shows
+  `"ERR"` and persists until `AC`/`C`/new digit entry. **Superseded by the
+  amendment below**: the first version of this story preserved
+  `left`/`operation` for a "correct and retry" flow; the user later asked
+  for a full `AC`-style reset instead — see "Amendment" notes. A network
+  failure shows `"UNAVAILABLE"` per this story's explicit A/C (verified by
+  killing the BE process mid-session and confirming the display, then
+  restarting it and confirming `AC` recovers cleanly) — rendered at a
+  smaller font size than digits/ERR so the longer word doesn't truncate.
+- New `src/lib/calculator-api.ts` wraps `fetch` and maps responses to
+  `{ok:true, result}` / `{ok:false, kind:"rejected", error, message}` /
+  `{ok:false, kind:"unavailable"}`; `right` is omitted from the request
+  body entirely (not sent as `undefined`/`null`) for sqrt. Targets
+  `${protocol}//${hostname}:8090` by default — the BE's port on the page's
+  own host, matching both local dev and docker-compose — overridable via
+  a `VITE_API_BASE_URL` build-time env var.
+- Depended on Story 1.3.1 (BE CORS), confirmed already implemented before
+  this story began: the FE calls the BE's absolute origin directly with no
+  reverse proxy in either `vite.config.ts` or `nginx.conf`.
+- `display-main.tsx`'s prop changed from `isError: boolean` to `status`;
+  `keypad.tsx` now takes the real `operation` state (renamed from Story
+  1.2's cosmetic `activeOperation` toggle) plus a `disabled` prop threaded
+  through `input-button.tsx`/`action-button.tsx` to the shadcn `Button`.
+- `sezzle-ta-calculator-fe/README.md` gained a "Using the calculator"
+  section (keyboard/click usage, the BE dependency, `ERR`/`UNAVAILABLE`
+  meaning, and the `VITE_API_BASE_URL` override) per this story's A/C.
+- Verified via `npm run lint`, `npm run build`, and a live browser session
+  against the real Go BE (not mocked): every CONTRACT.md scenario category
+  exercised through the UI — happy-path add/divide, decimal rounding
+  (`1 ÷ 3 = 0.3333`), `division_by_zero`, operation chaining without
+  pressing `=` in between, the sqrt short-circuit above, and the
+  `UNAVAILABLE` path. No test framework was added — still gated on
+  `agents.md`'s "first CONTRACT.md-driven test" rule, which this story
+  satisfies the precondition for but doesn't itself trigger, since
+  verification here was manual/live rather than an automated FE test.
+
+**Amendment (errors reset like AC; negative number entry).** After the
+above was verified, a live `/code-review` plus follow-up user feedback
+prompted two behavior changes, both confined to `calculator-shell.tsx` and
+`number-input.ts`:
+- Both a BE-rejected calculation and the client-side
+  `Number.MAX_SAFE_INTEGER` overflow guard now reset `left`/`operation`/
+  `isTemporal`/`displayValue`/`expression` immediately, as if `AC` had been
+  pressed, rather than preserving them for a "correct and retry" flow.
+  `"ERR"` still persists until the user acts for a BE rejection; the
+  overflow guard keeps its existing ~900ms auto-revert, now revealing a
+  cleared `"0"` instead of the pre-overflow number when it expires. A
+  network failure (`"unavailable"`) is deliberately **not** included in
+  this reset — the BE never actually rejected anything, so
+  `left`/`operation`/`displayValue` stay intact for a plain retry via `=`.
+- Any pending overflow auto-revert timer is now cancelled
+  (`clearErrorTimeout()`) whenever a real BE response arrives, closing a
+  race where a stale timer could silently flip a genuine BE error back to
+  `"ok"` ~900ms later.
+- Negative number entry: the `−` key/button (keyboard `-` and the keypad
+  button both funnel through the same `subtract` action) is now
+  contextual — pressed while the current entry is blank (regardless of
+  whether an operation is already pending), it inserts a leading minus
+  sign via `handleDigit("-")` instead of triggering `subtract`; once a
+  digit exists, it behaves exactly as `subtract` did before. Trade-off
+  accepted by the user: there's no longer a blank-entry gesture to swap a
+  *pending* operation specifically to `subtract` (add/multiply/divide/power
+  can still be swapped while blank) — pressing `−` there always starts a
+  negative number now. `number-input.ts` gained a new `isBlankOperand()`
+  guard (`""` or a lone `"-"`) used everywhere `displayValue` was checked
+  for "nothing to operate on," so a lone `-` can never reach `Number()`/the
+  BE as `NaN`. Verified live: `-1 × -10 = 10` with the expression trail
+  reading `-1 × -10`.
+- Three bugs the `/code-review` agent found in this same code were fixed
+  alongside the above (all reproduced and re-verified live):
+  (1) chaining to a *different* operator while `status === "unavailable"`
+  was resubmitting the stale old operation instead of the new one — fixed
+  by extending the "swap the operation, don't compute" branch to also
+  cover `status === "unavailable"`, resetting `status` back to `"ok"` so
+  the preserved right-hand entry reappears for the corrected operator;
+  (2) clicking an operator directly after `=` (no digit typed) left a
+  stale `expression`/`isTemporal` trail on screen — fixed by resetting
+  both when committing a fresh `left`; (3) the same stale-trail issue on
+  plain `C` right after a result — fixed the same way, gated on
+  `isTemporal`. The `/code-review` run's other findings (a BE CORS
+  same-origin edge case on non-`localhost` hosts, a BE `power`
+  Inf-vs-`invalid_operation` gap for `0^-1`, and two architecture
+  suggestions about `calculator-shell`'s state shape and the keyboard
+  hook's effect dependencies) were **not** acted on — they're BE-module or
+  pure-refactor items outside this amendment's scope.
+- Verified via `npm run lint`, `npm run build`, and a live browser session
+  against the real BE for every change above (a stale `docker compose`
+  container from earlier CORS testing was found squatting on ports
+  4080/8090 mid-verification, serving a pre-amendment build — stopped so
+  the real local dev/BE servers could be tested instead).

@@ -42,16 +42,16 @@ follow-up: yes, fix the priority bugs and include the scenarios to keep testing 
 ---
  I've manually tested , commit changes and mark story done
 ---
-/bmad-build story 1.2 use contents of planning folder any new files needed to track desicions/stories should be created on the same
+planning-mode ->/bmad-build story 1.2 use contents of planning folder any new files needed to track desicions/stories should be created on the same
   folder/added as modifications to epics.md (keep all changes in fe module, respect contract.md though this should be a design only issue)
 ---
 I have reviewed, commit.
 ---
 /compact
 ---
-/bmad-build story 1.3 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md, keep ports consistent for the FE as we did for BE.
+planning-mode -> /bmad-build story 1.3 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md, keep ports consistent for the FE as we did for BE.
 ---
-/bmad-method:bmad-build story 1.4 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md, this is planning assume 1.3 will be done before implementing.
+planning-mode ->/bmad-method:bmad-build story 1.4 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md, this is planning assume 1.3 will be done before implementing.
 
 follow up: required new story for cors
 ---
@@ -59,4 +59,12 @@ Was wrong to request the change from subtract to substract, apply the correct sp
 ---
 /compact
 ---
-/bmad-build  story 1.3.1 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.mdee
+planning-mode -> /bmad-build  story 1.3.1 use contents of planning folder any new files needed to track desicions/stories should be created on the same folder/added as modifications to epics.md
+---
+Commit and include readme and prompts changes.
+---
+planning-mode -> resume  planning work now that 1.3.1 is completed
+---
+/code-review
+---
+planning-mode -> Add to Story if an operation returns an ERROR like overflow or another thing, the state of the calculator should be as if cleared state through AC, this is the same for overflow from writing too big numbers. Also in the ui allow - to be inputed as character for negative number.
