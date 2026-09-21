@@ -68,3 +68,5 @@ planning-mode -> resume  planning work now that 1.3.1 is completed
 /code-review
 ---
 planning-mode -> Add to Story if an operation returns an ERROR like overflow or another thing, the state of the calculator should be as if cleared state through AC, this is the same for overflow from writing too big numbers. Also in the ui allow - to be inputed as character for negative number.
+---
+Include unit test coverage report on the main readme.md

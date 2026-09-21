@@ -42,11 +42,21 @@ npm run dev        # start the Vite dev server
 npm run build       # type-check (tsc -b) and produce a production build in dist/
 npm run preview      # serve the production build locally
 npm run lint       # oxlint
+npm run test       # run the Vitest suite once
+npm run test:watch  # run Vitest in watch mode
+npm run coverage    # run the suite with a v8 coverage report (text + html)
 ```
 
-There is no test runner configured yet — add one (and the corresponding
-script) when the first test is written, driven by scenarios in
-`../CONTRACT.md`.
+Vitest (`vite.config.ts`'s `test` block, `jsdom` environment) covers the
+pure logic layer under `src/lib/` — digit/number formatting
+(`number-input.ts`) and the BE API client (`calculator-api.ts`) — driven by
+`../CONTRACT.md`'s request/response shapes and error codes, as `*.test.ts`
+files next to the module they cover. Component/UI behavior isn't unit
+tested; it's verified by hand in a real browser (see `Planning/epics.md`'s
+implementation notes for what was checked). Coverage's `include` is scoped
+to `src/lib/**/*.ts` for the same reason — see the root
+[`README.md`](../README.md)'s "Testing & coverage" section for the current
+numbers.
 
 ## Docker
 

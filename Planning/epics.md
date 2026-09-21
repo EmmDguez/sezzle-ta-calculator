@@ -331,3 +331,44 @@ prompted two behavior changes, both confined to `calculator-shell.tsx` and
   container from earlier CORS testing was found squatting on ports
   4080/8090 mid-verification, serving a pre-amendment build — stopped so
   the real local dev/BE servers could be tested instead).
+
+## Testing infrastructure (FE unit tests + coverage, both modules' READMEs)
+
+The FE `agents.md` had a standing rule: "there is no test runner configured
+yet — add one ... when the first CONTRACT.md-driven test is written." Story
+1.4's amendment above (the API client, the digit/negative-number rules)
+was exactly that trigger, so this adds it rather than leaving it deferred
+further:
+- Added Vitest + `@vitest/coverage-v8` + `jsdom` to the FE (`vite.config.ts`
+  gained a `test` block; `package.json` gained `test`/`test:watch`/
+  `coverage` scripts). `src/lib/number-input.test.ts` and
+  `src/lib/calculator-api.test.ts` cover the digit/negative-number entry
+  rules and the BE API client's request shape and response mapping
+  (success, every `CalculateResult` failure kind, and CONTRACT.md's
+  sqrt-omits-`right` rule), all driven directly by CONTRACT.md rather than
+  component behavior.
+- Coverage is intentionally scoped to `src/lib/**/*.ts` (97.4% statements /
+  95.7% branches / 100% functions) rather than the whole `src/` tree —
+  component/UI code is still verified by hand in a real browser (as
+  documented throughout this file's implementation notes), not by
+  automated tests, so including it in the coverage percentage would make
+  the number meaningless rather than informative.
+- The one uncovered branch in `number-input.ts` (`exceedsMaxSafeInteger`'s
+  early-return for an empty/incomplete candidate) is dead code from
+  `appendDigit`'s only call site — every real caller already guarantees a
+  candidate with at least one digit — left as defensive code rather than
+  removed, since this was a testing pass, not a refactor.
+- The BE already had a full `go test` suite (Stories 1.1/1.3.1); this pass
+  only added `-coverpkg=./...` to its documented coverage command in
+  `sezzle-ta-calculator-be/README.md`, since plain `go test ./... -cover`
+  hides that `internal/validate` is actually exercised indirectly through
+  `internal/handler`'s tests (0% own-package coverage vs. its real
+  85.7%/100% function coverage under `-coverpkg=./...`).
+- Both module READMEs and `agents.md` files, plus the root `README.md`,
+  gained a coverage section/table with the commands to reproduce the
+  numbers — explicitly framed as a point-in-time snapshot to re-run, not a
+  maintained badge, since neither module has CI configured to keep one
+  fresh.
+- Verified: `npm run test` (30 tests, all passing) and `npm run coverage`
+  in the FE; `go test ./... -coverpkg=./...` and `go tool cover -func` in
+  the BE; `npm run lint` and `npm run build` still clean.

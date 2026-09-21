@@ -30,6 +30,37 @@ Each module also runs on its own, without Docker, for local development. See:
 - [`sezzle-ta-calculator-be/README.md`](./sezzle-ta-calculator-be/README.md)
 - [`sezzle-ta-calculator-fe/README.md`](./sezzle-ta-calculator-fe/README.md)
 
+## Testing & coverage
+
+Both modules have unit tests, each driven by [`CONTRACT.md`](./CONTRACT.md)'s
+request/response shapes, error codes, and test-scenario table.
+
+```bash
+# BE — from sezzle-ta-calculator-be/
+go test ./... -coverpkg=./... -coverprofile=coverage.out
+go tool cover -func=coverage.out
+
+# FE — from sezzle-ta-calculator-fe/
+npm run coverage
+```
+
+Coverage snapshot as of this commit (re-run the commands above for the
+current numbers — this is a point-in-time capture, not a maintained badge):
+
+| Module | Scope | Stmts | Branch | Funcs |
+| --- | --- | --- | --- | --- |
+| BE (`go test ./... -coverpkg=./...`) | whole module (`cmd/` excluded — it's just the entrypoint) | 84.2% | — (Go's tool doesn't report branch %) | — |
+| FE (`npm run coverage`) | `src/lib/` — digit/number formatting + the BE API client | 97.4% | 95.7% | 100% |
+
+The FE's coverage is intentionally scoped to `src/lib/` (pure logic, no
+React) rather than the whole `src/` tree: component/UI behavior is verified
+by hand in a real browser instead of with automated tests — see
+`Planning/epics.md`'s implementation notes on each story for what was
+checked. The BE's `internal/calculator`, `internal/handler`, and
+`internal/server` packages are close to fully covered; `internal/validate`
+has no test file of its own but is exercised indirectly through the
+handler tests (hence `-coverpkg=./...` above, not plain `-cover`).
+
 ## 
 
 * Using claude as an AI tool for development

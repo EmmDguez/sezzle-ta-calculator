@@ -65,7 +65,14 @@ repo root, which starts both.
 npm run build     # type-check (tsc -b) and produce a production build in dist/
 npm run preview   # serve the production build locally (http://localhost:4080, same port as dev)
 npm run lint      # oxlint
+npm run test      # run the unit test suite (Vitest)
+npm run coverage  # run the suite with a coverage report (text summary + coverage/index.html)
 ```
+
+Unit tests cover `src/lib/` — the digit/number formatting rules and the BE
+API client — against `../CONTRACT.md`'s request/response shapes and error
+codes. See the root [`README.md`](../README.md) for a current coverage
+snapshot.
 
 ## Run with Docker
 

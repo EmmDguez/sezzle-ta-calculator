@@ -70,8 +70,17 @@ go vet ./...                              # vet
 gofmt -l .                               # check formatting (should print nothing)
 go test ./...                             # run all tests
 go test ./internal/handler/... -run TestFoo   # run a single test
+go test ./... -coverpkg=./... -coverprofile=coverage.out   # run all tests with coverage
+go tool cover -func=coverage.out            # coverage summary per function
+go tool cover -html=coverage.out            # open an HTML coverage report
 go mod tidy                              # sync go.mod/go.sum after adding imports
 ```
+
+`-coverpkg=./...` is needed for an accurate number — `internal/validate` has
+no test file of its own but is exercised indirectly through
+`internal/handler`'s tests, and plain `go test ./... -cover` only measures
+each package against its own tests. See the root
+[`README.md`](../README.md) for a current coverage snapshot.
 
 ## Run with Docker
 
