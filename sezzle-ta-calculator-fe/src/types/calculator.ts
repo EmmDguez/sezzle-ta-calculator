@@ -2,7 +2,7 @@
 // Story 1.4 can reuse this vocabulary for the real API payload unchanged.
 export type Operation =
   | "add"
-  | "substract"
+  | "subtract"
   | "multiply"
   | "divide"
   | "power"

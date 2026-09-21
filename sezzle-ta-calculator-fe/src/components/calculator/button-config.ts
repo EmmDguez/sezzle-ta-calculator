@@ -11,7 +11,7 @@ export const OPERATION_BUTTON: Record<Operation, OperationButtonConfig> = {
   sqrt: { label: "√", ariaLabel: "Square root" },
   divide: { label: "÷", ariaLabel: "Divide" },
   multiply: { label: "×", ariaLabel: "Multiply" },
-  substract: { label: "−", ariaLabel: "Subtract" },
+  subtract: { label: "−", ariaLabel: "Subtract" },
   add: { label: "+", ariaLabel: "Add" },
   power: { label: "x^y", ariaLabel: "Power" },
 };
@@ -23,7 +23,7 @@ export const KEY_TO_ACTION: Record<string, ActionKind> = {
   Enter: "equals",
   "=": "equals",
   "+": "add",
-  "-": "substract",
+  "-": "subtract",
   "*": "multiply",
   "/": "divide",
   "^": "power",

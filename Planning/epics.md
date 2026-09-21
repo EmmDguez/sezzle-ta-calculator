@@ -23,7 +23,6 @@ A/C:
 - Tests: `internal/calculator/calculator_test.go` and `internal/handler/calculate_test.go` cover every row in contract.md's test scenario table (including the new decimal rows) plus edge cases (non-object JSON body, explicit-zero inputs, overflow-vs-domain-error precedence); `internal/server/server_test.go` proves the routes are actually wired.
 - Follow-up after this story was marked done: `sqrt` now rejects a present `right` operand (any value, including `0`) as `unsupported_operation`, since `sqrt` only uses `left`. contract.md's request description and test scenario table were updated accordingly.
 - Follow-up: `substract` was a genuine typo, not an intentional spelling (an earlier note here incorrectly assumed the latter) — corrected to `subtract` everywhere: contract.md's operation enum and test scenario table, the `internal/calculator` map key, and the operation buttons list in Story 1.2 below.
-- Reversal of the above: `substract` is the intended spelling after all (per direct instruction) — reverted `subtract` back to `substract` everywhere it had been changed: contract.md's operation enum and test scenario table, the `internal/calculator` map key (the exported Go function name stays correctly spelled `Subtract`; only the API/map-key string reverted), `calculator_test.go`'s scenario table, and the FE's `Operation` type, `button-config.ts`, and `keypad.tsx` (the FE's `ariaLabel: "Subtract"` display text also stays correctly spelled — only the operation identifier reverted).
 - Follow-up via `/code-review`: `round4` silently corrupted results above ~9×10^11 (well inside MAX_SAFE_INTEGER) because multiplying by 10000 before rounding exceeded float64's exact 2^53 integer range — e.g. `Add(9007199254740990, 1)` returned `9007199254740990` instead of `9007199254740991`. Fixed by leaving values above a `roundSafeLimit` threshold unchanged; contract.md gained a regression scenario (`add | 9007199254740990 | 1 | 9007199254740991`).
 
 ### Story 1.2: FE: Design draft + static components
@@ -43,7 +42,7 @@ Using superdesign tool, define a layout for the calculator that will be comprise
   will trigger an action depending of the button
 	* AC, clears display-main and display-expression, if there is an ongoing operation it is cancelled.
 	* C, clears the value of display-main, the current value to be inputed.
-	* The operation buttons are add, substract, multiply, divide, power, sqrt.
+	* The operation buttons are add, subtract, multiply, divide, power, sqrt.
 	* =, equals button  
 
 A/C:
@@ -60,7 +59,7 @@ A/C:
   action-button, keypad) plus `src/lib/number-input.ts` (digit/format
   validation) and `src/types/calculator.ts` (the `Operation`/`ActionKind`
   vocabulary, kept identical to CONTRACT.md's operation strings — add,
-  substract, multiply, divide, power, sqrt — for Story 1.4 forward-compatibility).
+  subtract, multiply, divide, power, sqrt — for Story 1.4 forward-compatibility).
 - calculator-shell owns only local `displayValue`, `expression` (always
   blank in this story), `isError`, and a cosmetic `activeOperation`
   highlight — no `left`/`operation`/`right`/`isTemporal` state machine and
