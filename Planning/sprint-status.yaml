@@ -15,19 +15,19 @@
 # Action item: open | in-progress | done
 
 generated: 09-21-2026 13:02
-last_updated: 09-21-2026 14:55
+last_updated: 09-21-2026 16:21
 project: sezzle-ta-calculator
 project_key: NOKEY
 tracking_system: file-system
 story_location: "Planning"
 
 development_status:
-  epic-1: in-progress
+  epic-1: done
   1-1-be-operations-endpoint: done
   1-2-fe-design-draft-static-components: done
   1-3-create-a-docker-compose-file-to-connect-both-modules: done
   1-3-1-be-enable-cors-for-the-fe-origin: done
-  1-4-fe-state-wiring-to-the-real-api: backlog
+  1-4-fe-state-wiring-to-the-real-api: done
   epic-1-retrospective: optional
 
 action_items: []

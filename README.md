@@ -2,9 +2,14 @@
 
 Repo for technical assessment: a calculator application split into two
 independently deployable modules — a Go HTTP API and a TypeScript/React SPA.
-See [`agents.md`](./agents.md) for the repository layout and conventions, and
-[`CONTRACT.md`](./CONTRACT.md) for the API contract both modules implement
-against.
+See:
+
+- [`agents.md`](./agents.md) for the repository layout and conventions.
+- [`CONTRACT.md`](./CONTRACT.md) for the API contract both modules implement
+  against.
+- [`Planning/`](./Planning) for the epics/stories and sprint status tracking
+  this project was built against.
+- [`prompts.md`](./prompts.md) for the prompts used to build this project.
 
 ## Run everything with Docker Compose
 
