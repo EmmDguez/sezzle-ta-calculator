@@ -52,10 +52,12 @@ script) when the first test is written, driven by scenarios in
 
 `Dockerfile` is a two-stage build: `node:24-alpine` builds the app with
 `npm ci && npm run build`, and `nginx:1.27-alpine` serves the resulting
-`dist/` on port 8080 (`nginx.conf` rewrites unmatched paths to `index.html`
-for client-side routing).
+`dist/` on port 4080 (`nginx.conf` rewrites unmatched paths to `index.html`
+for client-side routing). 4080 is also the port used by `npm run dev` and
+`npm run preview` (set via `server.port`/`preview.port` in `vite.config.ts`),
+so the FE uses one consistent port everywhere.
 
 ```bash
 docker build -t sezzle-ta-calculator-fe .
-docker run -p 8080:8080 sezzle-ta-calculator-fe
+docker run -p 4080:4080 sezzle-ta-calculator-fe
 ```

@@ -95,6 +95,42 @@ A/C:
 API will live  on 8090 port and UI on 4080 port.
 - the Root readme.md is updated with information.
 
+**Status: done.** Implementation notes:
+- Added `docker-compose.yml` at the repo root with two services: `api`
+  (builds `sezzle-ta-calculator-be`, published on host port 8090, with
+  `PORT=8090` set explicitly even though it's already the BE's default) and
+  `ui` (builds `sezzle-ta-calculator-fe`, published on host port 4080,
+  `depends_on: api`). No custom network is declared — compose's default
+  network already gives the containers service-name DNS resolution
+  (`http://api:8090`) for when Story 1.4 wires real FE→BE calls. No
+  `healthcheck:` was added: the BE runtime image is
+  `gcr.io/distroless/static-debian12`, which has no shell/curl/wget to run a
+  check with.
+- FE port consistency fix (requested alongside this story): the FE
+  previously used three different ports depending on how it ran —
+  `npm run dev` defaulted to Vite's 5173, `npm run preview` to 4173, and the
+  Docker image listened on 8080 internally while being documented as
+  remapped to host 4080. `vite.config.ts` now sets `server.port` and
+  `preview.port` to `4080` with `strictPort: true` (fails loudly on a
+  conflict instead of silently picking another port), and `nginx.conf`
+  (`listen`) plus the FE `Dockerfile` (`EXPOSE`) were changed from 8080 to
+  4080 so the container's own listen port matches too — dev, preview, and
+  the Docker image now all use the same 4080, and `docker-compose.yml` maps
+  it `4080:4080` with no remapping. Updated every `docker run`/port example
+  and prose mention in `sezzle-ta-calculator-fe/README.md` and
+  `sezzle-ta-calculator-fe/agents.md` to match.
+- Root `README.md` (previously a 2-line stub) now documents the
+  `docker compose up --build` quickstart, the resulting URLs, and links out
+  to `CONTRACT.md` and each module's own README for standalone dev. Root
+  `agents.md`'s repository layout tree now lists `docker-compose.yml` and
+  `README.md`.
+- Follow-up flagged for Story 1.4: the BE has no CORS middleware anywhere
+  (grepped, zero matches). This isn't required for this story — the FE
+  doesn't call the BE yet (Story 1.2, done today, is static-only) — but once
+  Story 1.4 wires the FE to actually call the BE across origins
+  (`localhost:4080` → `localhost:8090`), CORS headers will be needed on the
+  BE for browser fetches to succeed.
+
 ### Story 1.4: FE: State wiring to the real API.
 As a user I required the actions in the calculator to generate results that are correct and valid.
 

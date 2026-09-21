@@ -22,22 +22,23 @@ npm install
 npm run dev
 ```
 
-The dev server starts on **http://localhost:5173** by default (Vite prints
-the exact URL on startup).
+The dev server starts on **http://localhost:4080** (fixed via `server.port` in
+`vite.config.ts`, with `strictPort: true` so it fails instead of silently
+picking a different port if 4080 is already in use).
 
 ### Validate it's running
 
 ```bash
-curl -sf http://localhost:5173/ > /dev/null && echo "FE dev server OK"
+curl -sf http://localhost:4080/ > /dev/null && echo "FE dev server OK"
 ```
 
-Or just open http://localhost:5173 in a browser and confirm the page loads.
+Or just open http://localhost:4080 in a browser and confirm the page loads.
 
 ## Other commands
 
 ```bash
 npm run build     # type-check (tsc -b) and produce a production build in dist/
-npm run preview   # serve the production build locally (defaults to http://localhost:4173)
+npm run preview   # serve the production build locally (http://localhost:4080, same port as dev)
 npm run lint      # oxlint
 ```
 
@@ -45,11 +46,12 @@ npm run lint      # oxlint
 
 ```bash
 docker build -t sezzle-ta-calculator-fe .
-docker run --rm -p 4080:8080 sezzle-ta-calculator-fe
+docker run --rm -p 4080:4080 sezzle-ta-calculator-fe
 ```
 
 This builds the app with `node:24-alpine` and serves the static output with
-`nginx:1.27-alpine` on port 8080.
+`nginx:1.27-alpine` on port 4080 — the same port used for local dev and
+preview, so there's only one FE port to remember.
 
 ### Validate the container is running
 

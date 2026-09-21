@@ -11,4 +11,12 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  server: {
+    port: 4080,
+    strictPort: true,
+  },
+  preview: {
+    port: 4080,
+    strictPort: true,
+  },
 })

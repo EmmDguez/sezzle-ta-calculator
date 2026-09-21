@@ -34,6 +34,8 @@ doesn't already describe.
 .
 ├── AGENTS.md                    # this file
 ├── CONTRACT.md                  # API contract + test scenarios (read first)
+├── README.md                    # quickstart, incl. docker compose usage
+├── docker-compose.yml           # runs both modules together (UI :4080, API :8090)
 ├── sezzle-ta-calculator-fe/     # frontend module (see its agents.md)
 └── sezzle-ta-calculator-be/     # backend module (see its agents.md)
 ```

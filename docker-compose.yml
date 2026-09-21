@@ -1,0 +1,14 @@
+services:
+  api:
+    build: ./sezzle-ta-calculator-be
+    ports:
+      - "8090:8090"
+    environment:
+      - PORT=8090
+
+  ui:
+    build: ./sezzle-ta-calculator-fe
+    ports:
+      - "4080:4080"
+    depends_on:
+      - api
